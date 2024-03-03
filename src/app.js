@@ -15,6 +15,8 @@ const runApp = () => {
   };
   const watchedState = onChange(state, render);
 
+  console.log('akdbvakdjvbd');
+
   const schema = yup
     .string().required().url().notOneOf(state.addingFeedsForm.paths);
 
