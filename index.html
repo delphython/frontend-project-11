@@ -8,27 +8,32 @@
 </head>
 
 <body>
-  <section class="container-fluid bg-dark p-5">
-    <div class="row">
-      <div class="col-md-10 col-lg-8 mx-auto text-white">
-        <h1 class="display-3 mb-0">RSS агрегатор</h1>
-        <p class="lead">Начните читать RSS сегодня! Это легко, это красиво.</p>
-        <form action="" class="rss-form text-body">
-          <div class="row">
-            <div class="col">
-              <div class="form-floating"><input id="url-input" autofocus="" required="" name="url" aria-label="url"
-                  class="form-control w-100" placeholder="ссылка RSS" autocomplete="off"> <label for="url-input">Ссылка
-                  RSS</label></div>
+  <main>
+    <section class="container-fluid">
+      <div class="row justify-content-center">
+        <div class="col-8">
+          <h1>RSS agregator</h1>
+          <p class="lead">Follow your favorite websites</p>
+          <form class="rss-form">
+            <div class="row">
+              <div class="col">
+                <div class="form">
+                  <input id="url-input" name="url" aria-label="url" class="form-control" placeholder="ссылка RSS"
+                    autocomplete="off">
+                  <label for="url-input" class="sr-only">Ссылка RSS</label>
+                </div>
+              </div>
+              <div class="col-auto">
+                <button type="submit" aria-label="add" class="h-100 btn btn-lg btn-success px-sm-5">Add</button>
+              </div>
             </div>
-            <div class="col-auto"><button type="submit" aria-label="add"
-                class="h-100 btn btn-lg btn-primary px-sm-5">Добавить</button></div>
-          </div>
-        </form>
-        <p class="mt-2 mb-0 text-muted">Пример: https://lorem-rss.hexlet.app/feed</p>
-        <p class="feedback m-0 position-absolute small text-success">RSS успешно загружен</p>
+          </form>
+          <p class="mt-2 small mb-0 text-muted">Example: https://ru.hexlet.io/lessons.rss</p>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+    <section class="feedback"></section>
+  </main>
 </body>
 
 </html>
