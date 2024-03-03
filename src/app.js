@@ -2,7 +2,7 @@
 import 'bootstrap';
 import * as yup from 'yup';
 import onChange from 'on-change';
-import css from './styles.css';
+import css from './styles.scss';
 import render from './render.js';
 
 const runApp = () => {
