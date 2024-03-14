@@ -5,7 +5,7 @@ import onChange from 'on-change';
 import css from './styles.scss';
 import render from './render.js';
 
-const runApp = () => {
+const App = () => {
   const state = {
     addingFeedsForm: {
       paths: [],
@@ -43,4 +43,4 @@ const runApp = () => {
   });
 };
 
-runApp();
+export default App;
