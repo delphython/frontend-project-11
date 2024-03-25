@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import 'bootstrap';
 import * as yup from 'yup';
+import axios from 'axios';
 import i18next from 'i18next';
 import watch from './view';
 import ru from './locales/ru.js';
@@ -8,7 +9,7 @@ import ru from './locales/ru.js';
 const App = async () => {
   const i18nextInstance = i18next.createInstance();
   await i18nextInstance.init({
-    lang: 'ru',
+    lng: 'ru',
     debug: true,
     resources: {
       ru,
@@ -59,5 +60,12 @@ const App = async () => {
       });
   });
 };
+
+axios.get('https://allorigins.hexlet.app/get?disableCache=true&url=https://lorem-rss.hexlet.app/feed')
+  .then((response) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(response, 'text/html');
+    console.log(doc);
+  });
 
 export default App;
