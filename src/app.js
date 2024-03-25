@@ -80,7 +80,7 @@ const App = async () => {
     const formData = new FormData(evt.target);
     const currentUrl = formData.get('url');
 
-    watchedState.loadingProcess = { status: 'loading', error: null };
+    watchedState.form.status = 'loading';
     const urls = state.feeds.map((feed) => feed.url);
     validateUrl(currentUrl, urls)
       .then((link) => axios.get(getProxiedUrl(link)))
