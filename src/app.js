@@ -1,44 +1,53 @@
 #!/usr/bin/env node
 import 'bootstrap';
 import * as yup from 'yup';
-import onChange from 'on-change';
 import css from './styles.scss';
-import render from './render.js';
+// import render from './render.js';
+
+import watch from './view';
 
 const App = () => {
-  const state = {
-    addingFeedsForm: {
-      paths: [],
-      valid: '',
-      errors: [],
-    },
+  const elements = {
+    input: document.querySelector('#url-input'),
+    feedback: document.querySelector('.feedback'),
+    form: document.querySelector('form'),
+    button: document.querySelector('button'),
   };
-  const watchedState = onChange(state, render);
 
-  console.log('akdbvakdjvbd');
+  const state = {
+    form: {
+      status: 'filling',
+      error: null,
+    },
+    urls: [],
+  };
 
-  const schema = yup
-    .string().required().url().notOneOf(state.addingFeedsForm.paths);
+  const watchedState = watch(state, elements);
 
-  const formElement = document.querySelector('.rss-form');
-  formElement.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const data = formData.get('url');
-    schema.validate(data, { abortEarly: false })
-      .then((path) => {
-        watchedState.addingFeedsForm = {
-          paths: state.paths.push(path),
-          valid: 'valid',
-          errorMessage: null,
-        };
-        // здесь будет выполняться асинхронный запрос на сервер,
+  const validateUrl = (url, urls) => yup
+    .string()
+    .url('Ссылка должна быть валидным URL')
+    .notOneOf(urls, 'RSS уже загружен')
+    .required()
+    .validate(url);
+
+  elements.form.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+    const formData = new FormData(evt.target);
+    const currentUrl = formData.get('url');
+    validateUrl(currentUrl, watchedState.urls)
+      .then((link) => {
+        watchedState.form.status = 'loading';
+        setTimeout(() => {
+          watchedState.form.status = 'success';
+          watchedState.urls.push(link);
+          console.log(watchedState.urls);
+        }, 2000);
+        return link;
       })
-      .catch(({ errors }) => {
-        watchedState.addingFeedsForm = {
-          valid: 'invalid',
-          errors,
-        };
+      .catch((err) => {
+        watchedState.form.status = 'failed';
+        watchedState.form.error = err.message;
       });
   });
 };
