@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import 'bootstrap';
+
 import * as yup from 'yup';
 import axios from 'axios';
 import i18next from 'i18next';
@@ -58,7 +58,7 @@ const App = async () => {
       .then((link) => axios.get(getProxiedUrl(link)))
       .then((response) => {
         const data = parser(response.data.contents);
-        watchedState.feeds.unshift(data.feed);
+        watchedState.feeds.push(data.feed);
         watchedState.posts.unshift(data.items);
         watchedState.form.status = 'success';
         watchedState.urls.push(currentUrl);
