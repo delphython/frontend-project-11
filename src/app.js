@@ -1,12 +1,20 @@
 #!/usr/bin/env node
 import 'bootstrap';
 import * as yup from 'yup';
-import css from './styles.scss';
-// import render from './render.js';
-
+import i18next from 'i18next';
 import watch from './view';
+import ru from './locales/ru.js';
 
-const App = () => {
+const App = async () => {
+  const i18nextInstance = i18next.createInstance();
+  await i18nextInstance.init({
+    lang: 'ru',
+    debug: true,
+    resources: {
+      ru,
+    },
+  });
+
   const elements = {
     input: document.querySelector('#url-input'),
     feedback: document.querySelector('.feedback'),
@@ -22,13 +30,13 @@ const App = () => {
     urls: [],
   };
 
-  const watchedState = watch(state, elements);
+  const watchedState = watch(state, elements, i18nextInstance);
 
   const validateUrl = (url, urls) => yup
     .string()
-    .url('Ссылка должна быть валидным URL')
-    .notOneOf(urls, 'RSS уже загружен')
-    .required()
+    .url('invalidUrl')
+    .notOneOf(urls, 'alreadyLoaded')
+    .required('required')
     .validate(url);
 
   elements.form.addEventListener('submit', (evt) => {
