@@ -7,6 +7,39 @@ import watch from './view';
 import ru from './locales/ru.js';
 import parser from './parser.js';
 
+const getProxiedUrl = (url) => {
+  const resultUrl = new URL('https://allorigins.hexlet.app/get');
+  resultUrl.searchParams.set('url', url);
+  resultUrl.searchParams.set('disableCache', true);
+  return resultUrl;
+};
+
+const getUpdatePosts = (state) => {
+  const urls = state.feeds.map((feed) => feed.url);
+  const promises = urls.map((url) => axios.get(getProxiedUrl(url))
+    .then((response) => {
+      const data = parser(response.data.contents, url);
+
+      const comparator = (arrayValue, otherValue) => arrayValue.title === otherValue.title;
+      const addedPosts = _.differenceWith(data.items, state.posts, comparator);
+
+      state.posts = addedPosts.concat(...state.posts);
+    })
+    .catch((err) => {
+      console.error(err);
+    }));
+
+  Promise.all(promises)
+    .finally(() => setTimeout(() => getUpdatePosts(state), 5000));
+};
+
+const validateUrl = (url, urls) => yup
+  .string()
+  .url('invalidUrl')
+  .notOneOf(urls, 'alreadyLoaded')
+  .required('required')
+  .validate(url);
+
 const App = async () => {
   const i18nextInstance = i18next.createInstance();
   await i18nextInstance.init({
@@ -16,7 +49,6 @@ const App = async () => {
       ru,
     },
   });
-  const getProxiedUrl = (url) => `https://allorigins.hexlet.app/get?disableCache=true&url=${url}`;
 
   const elements = {
     input: document.querySelector('#url-input'),
@@ -39,17 +71,11 @@ const App = async () => {
 
   const watchedState = watch(state, elements, i18nextInstance);
 
-  const validateUrl = (url, urls) => yup
-    .string()
-    .url('invalidUrl')
-    .notOneOf(urls, 'alreadyLoaded')
-    .required('required')
-    .validate(url);
-
   elements.form.addEventListener('submit', (evt) => {
     evt.preventDefault();
     const formData = new FormData(evt.target);
     const currentUrl = formData.get('url');
+
     validateUrl(currentUrl, watchedState.urls)
       .then((link) => {
         watchedState.form.status = 'loading';
@@ -57,11 +83,11 @@ const App = async () => {
       })
       .then((link) => axios.get(getProxiedUrl(link)))
       .then((response) => {
-        const data = parser(response.data.contents);
+        const data = parser(response.data.contents, currentUrl);
         watchedState.feeds.push(data.feed);
         watchedState.posts.unshift(data.items);
-        watchedState.form.status = 'success';
         watchedState.urls.push(currentUrl);
+        watchedState.form.status = 'success';
       })
       .catch((err) => {
         watchedState.form.status = 'failed';
@@ -72,6 +98,7 @@ const App = async () => {
         watchedState.form.error = err.message;
       });
   });
+  getUpdatePosts(watchedState);
 };
 
 export default App;
