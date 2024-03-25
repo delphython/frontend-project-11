@@ -1,4 +1,5 @@
 import onChange from 'on-change';
+import postsRender from './postsRender';
 
 const clear = (elements) => {
   const { input, feedback } = elements;
@@ -46,6 +47,10 @@ const watch = (state, elements, i18nextInstance) => onChange(state, (path, value
     }
     case 'form.error': {
       handleError(value, elements, i18nextInstance);
+      break;
+    }
+    case 'posts': {
+      postsRender(value, elements, i18nextInstance);
       break;
     }
     default:
