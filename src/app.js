@@ -30,6 +30,7 @@ const updatePosts = (state) => {
       if (addedPosts.length === 0) {
         return;
       }
+      // eslint-disable-next-line no-param-reassign
       state.posts = addedPosts.concat(...state.posts);
     })
     .catch((err) => {
@@ -103,6 +104,7 @@ const App = () => {
           data.feed.id = _.uniqueId();
           data.feed.url = currentUrl;
           data.items.forEach((item) => {
+            // eslint-disable-next-line no-param-reassign
             item.id = _.uniqueId();
           });
           watchedState.feeds.push(data.feed);
