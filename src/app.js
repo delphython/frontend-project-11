@@ -45,9 +45,9 @@ const validateUrl = (url, urls) => yup
   .required('required')
   .validate(url);
 
-const App = async () => {
+const App = () => {
   const i18nextInstance = i18next.createInstance();
-  await i18nextInstance.init({
+  i18nextInstance.init({
     lng: 'ru',
     debug: false,
     resources: {
