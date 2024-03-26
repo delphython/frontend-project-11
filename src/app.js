@@ -3,6 +3,7 @@
 import * as yup from 'yup';
 import axios from 'axios';
 import i18next from 'i18next';
+import _ from 'lodash';
 import watch from './view';
 import ru from './locales/ru.js';
 import parser from './parser.js';
@@ -80,6 +81,13 @@ const App = () => {
 
   const watchedState = watch(state, elements, i18nextInstance);
 
+  const typeError = (err) => {
+    if (err.name === 'AxiosError') {
+      return 'network';
+    }
+    return err.message;
+  };
+
   elements.form.addEventListener('submit', (evt) => {
     evt.preventDefault();
     const formData = new FormData(evt.target);
@@ -104,11 +112,8 @@ const App = () => {
       })
       .catch((err) => {
         watchedState.loadingProcess.status = 'failed';
-        if (err.name === 'AxiosError') {
-          watchedState.form.error = 'network';
-          return;
-        }
-        watchedState.form.error = err.message;
+        watchedState.form.error = typeError(err);
+        watchedState.form.valid = false;
       });
   });
 
