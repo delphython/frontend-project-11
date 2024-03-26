@@ -7,6 +7,8 @@ import watch from './view';
 import ru from './locales/ru.js';
 import parser from './parser.js';
 
+const delay = 5000;
+
 const getProxiedUrl = (url) => {
   const resultUrl = new URL('https://allorigins.hexlet.app/get');
   resultUrl.searchParams.set('url', url);
@@ -18,7 +20,7 @@ const getUpdatePosts = (state) => {
   const urls = state.feeds.map((feed) => feed.url);
   const promises = urls.map((url) => axios.get(getProxiedUrl(url))
     .then((response) => {
-      const data = parser(response.data.contents, url);
+      const data = parser(response.data.contents);
 
       const comparator = (arrayValue, otherValue) => arrayValue.title === otherValue.title;
       const addedPosts = _.differenceWith(data.items, state.posts, comparator);
@@ -33,7 +35,7 @@ const getUpdatePosts = (state) => {
     }));
 
   Promise.all(promises)
-    .finally(() => setTimeout(() => getUpdatePosts(state), 5000));
+    .finally(() => setTimeout(() => getUpdatePosts(state), delay));
 };
 
 const validateUrl = (url, urls) => yup
@@ -79,13 +81,17 @@ const App = async () => {
     evt.preventDefault();
     const formData = new FormData(evt.target);
     const currentUrl = formData.get('url');
-
     watchedState.form.status = 'loading';
     const urls = state.feeds.map((feed) => feed.url);
     validateUrl(currentUrl, urls)
       .then((link) => axios.get(getProxiedUrl(link)))
       .then((response) => {
-        const data = parser(response.data.contents, currentUrl);
+        const data = parser(response.data.contents);
+        data.feed.id = _.uniqueId();
+        data.feed.url = currentUrl;
+        data.items.forEach((item) => {
+          item.id = _.uniqueId();
+        });
         watchedState.feeds.push(data.feed);
         watchedState.posts.unshift(...data.items);
         watchedState.form.status = 'success';
@@ -101,14 +107,11 @@ const App = async () => {
   });
 
   elements.posts.addEventListener('click', ({ target }) => {
-    if (target.dataset.id) {
-      const { id } = target.dataset;
-      watchedState.idCurrentPost = id;
-      if (!watchedState.idVisitedPosts.includes(id)) {
-        watchedState.idVisitedPosts.push(id);
-      }
+    const { id } = target.dataset;
+    watchedState.idCurrentPost = id;
+    if (!watchedState.idVisitedPosts.includes(id)) {
+      watchedState.idVisitedPosts.push(id);
     }
-    return false;
   });
 
   getUpdatePosts(watchedState);
